@@ -1,0 +1,23 @@
+# Node
+node_modules/
+npm-debug.log
+
+# ASP.NET
+bin/
+obj/
+*.user
+*.userprefs
+*.suo
+
+# IDEs and Editors
+.vs/
+.vscode/
+*.swp
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Secrets
+secrets.yml
+.env.local

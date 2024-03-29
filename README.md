@@ -40,6 +40,14 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - `npx prisma generate`: Generates Prisma client code that can be used in your application to interact with your database through the defined models in your Prisma schema.
 - `npx prisma db push`: Updates your database schema to match the schema defined in your Prisma model, without requiring migrations; suitable for development environments.
 
+### bcrypt
+A library for hashing and salting passwords. Used to securely store passwords in your database.
+
+
 ### [Auth.js](https://authjs.dev)
 - [prisma-adapter](https://authjs.dev/reference/adapter/prisma)
+Links Prisma models to Auth.js, facilitating user authentication and authorization through database models.
+
+
+
 

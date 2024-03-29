@@ -25,3 +25,21 @@ Contributions are welcome! Please refer to the contributing guidelines for more 
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
+
+
+## SaaS / PaaS used
+### [neon.tech PostgreSQL](https://console.neon.tech)
+- Create account, project and database.
+- Copy and paste provided snippets into files `.env` and `schema.prisma`.
+- Update `.gitignore` to include `.env`.
+
+
+## Tools / Libs used
+### Prisma
+- `npx prisma init`: Initializes a new Prisma project by creating a new Prisma schema file in your project, which is used to define your database models and setup.
+- `npx prisma generate`: Generates Prisma client code that can be used in your application to interact with your database through the defined models in your Prisma schema.
+- `npx prisma db push`: Updates your database schema to match the schema defined in your Prisma model, without requiring migrations; suitable for development environments.
+
+### [Auth.js](https://authjs.dev)
+- [prisma-adapter](https://authjs.dev/reference/adapter/prisma)
+

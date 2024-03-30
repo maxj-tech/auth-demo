@@ -52,6 +52,34 @@ Links Prisma models to Auth.js, facilitating user authentication and authorizati
 - Add `AUTH_SECRET` to `.env` file, randomly generated using 
 `openssl rand -hex 32`
 
+## TODO
+- describe contents of the .env and .env.local file
+
+
+The OAuth configuration details for GitHub and Google were condensed to ensure the updated document remained focused and concise, while still retaining all critical information necessary for understanding and progressing with the project. However, recognizing the importance of these OAuth setup steps for a comprehensive understanding, let’s reintegrate and clarify these details:
+
+## OAuth Configuration with GitHub and Google
+
+### Setting Up OAuth with GitHub
+1. **Create an OAuth Application**: Navigate to your GitHub account settings, access Developer Settings, then OAuth Apps, and create a new application.
+2. **Configuration**:
+   - **Homepage URL**: `http://localhost:3000`
+   - **Authorization Callback URL**: `http://localhost:3000/api/auth/callback/github` - ensures GitHub authentication responses are correctly processed.
+3. **Credentials**: Generate a new client secret. Then copy and paste your Client ID and Secret into the .env file for local development.
+
+### Setting Up OAuth with Google
+1. **Access Google Cloud Console**: Log into [Google Cloud Console](https://console.cloud.google.com), select or create a new project, and navigate to "APIs & Services".
+2. **Configure OAuth Consent Screen**: Select "External" as the user type and provide required details like app name and contact emails. Proceed through the setup without needing to fill all fields.
+3. **Create OAuth Client ID**:
+   - **Application Type**: Choose "Web application".
+   - **Authorized JavaScript Origins**: Add `http://localhost:3000` to handle responses from Google.
+   - **Authorized Redirect URIs**: Include `http://localhost:3000/api/auth/callback/google` to correctly handle the OAuth flow.
+4. **Store Credentials**: Similar to GitHub, Google will provide a Client ID and Secret. These should also be added to your `.env` file, securing your application’s ability to authenticate with Google.
+
+
+
+
+
 
 
 

@@ -53,6 +53,28 @@ export const {
         return session // always return what goes in from the callback
       }
     },
+
+    // see https://authjs.dev/guides/basics/events
+    events: {
+
+      // https://authjs.dev/guides/basics/events#linkaccount
+      /*  idea
+       *  if this event is triggered, we can assume that the user has just used
+       *  a social login (i.e. OAuth provider) for which we don't actually need
+       *  to verify the email address, as the OAuth provider has already done that.
+       *  So we can just set the emailVerified field to the current date.
+       */
+      async linkAccount({ user }) {
+        await db.user.update({
+          where: { id: user.id },
+          data: { emailVerified: new Date() }
+        })
+      }
+    },
+    pages: {
+      signIn: "/auth/login",
+      error: "/auth/error",
+    },
     adapter: PrismaAdapter(db),
     // with Prisma we cannot use the default session adapter as it uses a database
     // to store the session, which does not work on the edge

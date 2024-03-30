@@ -3,6 +3,19 @@ import authConfig from "@/auth.config"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 import { db } from "@/lib/db"
 import { getUserById } from "./data/user"
+import { UserRole } from '@prisma/client';
+
+
+
+// Module augmentation to solve typescript errors
+// see https://authjs.dev/getting-started/typescript#module-augmentation
+declare module "next-auth" {
+  interface Session {
+    user: {
+      role: UserRole  // add role to the session's user
+    }
+  }
+}
 
 export const {
   handlers: { GET, POST },
@@ -34,7 +47,7 @@ export const {
 
         if (token.role && session.user) {
           // fixme we need to add the role to the session type       
-          session.user.role = token.role  
+          session.user.role = token.role as UserRole; 
         }
 
         return session // always return what goes in from the callback

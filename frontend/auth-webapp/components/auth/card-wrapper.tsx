@@ -23,7 +23,7 @@ export const CardWrapper = ({
   headerLabel,
   backButtonLabel,
   backButtonHref,
-  showSocial = true
+  showSocial
 }: CardWrapperProps) => {
   return (
     <Card className="w-[400px] shadow-md">

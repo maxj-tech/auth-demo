@@ -39,6 +39,8 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - `npx prisma init`: Initializes a new Prisma project by creating a new Prisma schema file in your project, which is used to define your database models and setup.
 - `npx prisma generate`: Generates Prisma client code that can be used in your application to interact with your database through the defined models in your Prisma schema.
 - `npx prisma db push`: Updates your database schema to match the schema defined in your Prisma model, without requiring migrations; suitable for development environments.
+- `npx prisma migrate reset`: Resets the entire database.
+- `npx prisma studio`: Browse your database via webapp at [`localhost:5555`](http://localhost:5555).
 
 ### [bcryptjs](https://www.npmjs.com/package/bcryptjs) 
 A library for hashing and salting passwords. Used to securely store passwords in your database.

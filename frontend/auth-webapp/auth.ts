@@ -3,7 +3,7 @@ import authConfig from "@/auth.config"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 import { db } from "@/lib/db"
 import { getUserById } from "./data/user"
-import { UserRole } from '@prisma/client';
+import { UserRole } from '@prisma/client'
 
 
 
@@ -38,6 +38,7 @@ export const {
         }        
         return token // always return what goes in from the callback
       },
+
       async session({ token, session }) {
         console.info("session callback:", { session }, { sessionToken: token })
         
@@ -47,11 +48,27 @@ export const {
 
         if (token.role && session.user) {
           // fixme we need to add the role to the session type       
-          session.user.role = token.role as UserRole; 
+          session.user.role = token.role as UserRole
         }
 
         return session // always return what goes in from the callback
-      }
+      },
+
+      // even though we check this in the login action already,
+      // we should also check here if a user is allowed to sign in
+      async signIn({ user, account }) {
+
+        // Allow OAuth without email verification
+        if (account?.provider !== "credentials") return true
+  
+        const existingUser = await getUserById(user.id ?? "")
+  
+        // Prevent sign in without email verification
+        if (!existingUser?.emailVerified) return false
+  
+        // todo 2fa  
+        return true
+      },
     },
 
     // see https://authjs.dev/guides/basics/events

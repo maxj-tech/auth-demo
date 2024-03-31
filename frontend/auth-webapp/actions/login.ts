@@ -8,6 +8,7 @@ import { AuthError } from 'next-auth'
 import { signIn } from '@/auth'
 import { getUserByEmail } from '@/data/user'
 import { generateVerificationToken } from '@/lib/tokens'
+import { sendVerificationEmail } from '@/lib/mail'
 
 export const login = async (values: z.infer<typeof LoginSchema>) => {
   const validatedFields = LoginSchema.safeParse(values)
@@ -27,9 +28,11 @@ export const login = async (values: z.infer<typeof LoginSchema>) => {
     return { error: "Login via Github or Google!" }
 
   if (!existingUser.emailVerified){
-    const verficationToken = await generateVerificationToken(
+    const verifyToken = await generateVerificationToken(
       existingUser.email
     )
+
+    await sendVerificationEmail(verifyToken.email, verifyToken.token)
 
     return { error: "Email not yet verified! New verification email sent." }
   }

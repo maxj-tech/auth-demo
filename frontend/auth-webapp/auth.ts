@@ -57,6 +57,7 @@ export const {
       // even though we check this in the login action already,
       // we should also check here if a user is allowed to sign in
       async signIn({ user, account }) {
+        console.info("signIn callback:", { user, account })
 
         // Allow OAuth without email verification
         if (account?.provider !== "credentials") return true

@@ -6,6 +6,8 @@ import { LoginSchema } from '@/schemas'
 import { DEFAULT_LOGIN_REDIRECT } from '@/routes'
 import { AuthError } from 'next-auth'
 import { signIn } from '@/auth'
+import { getUserByEmail } from '@/data/user'
+import { generateVerificationToken } from '@/lib/tokens'
 
 export const login = async (values: z.infer<typeof LoginSchema>) => {
   const validatedFields = LoginSchema.safeParse(values)
@@ -16,6 +18,25 @@ export const login = async (values: z.infer<typeof LoginSchema>) => {
 
   const { email, password } = validatedFields.data
 
+  const existingUser = await getUserByEmail(email)
+
+  if (!existingUser || !existingUser.email)
+    return { error: "Invalid credentials!" }
+
+  if (!existingUser.password)
+    return { error: "Login via Github or Google!" }
+
+  if (!existingUser.emailVerified){
+    const verficationToken = await generateVerificationToken(
+      existingUser.email
+    )
+
+    return { error: "Email not yet verified! New verification email sent." }
+  }
+    
+
+  
+
   try {
     const result = await signIn("credentials", {
       email,
@@ -23,7 +44,7 @@ export const login = async (values: z.infer<typeof LoginSchema>) => {
       // explicit though redundant to middleware.ts and auth.config.ts
       redirectTo: DEFAULT_LOGIN_REDIRECT, 
     })
-    return { success: result ? "Login successful!" : undefined };
+    return { success: result ? "Login successful!" : undefined }
 
   } catch (error) {
     if (error instanceof AuthError) {
@@ -36,7 +57,7 @@ export const login = async (values: z.infer<typeof LoginSchema>) => {
     }
 
     // without this, it will not redirect
-    throw error;
+    throw error
   }
 }
 

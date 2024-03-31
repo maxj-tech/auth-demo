@@ -40,10 +40,23 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - `npx prisma generate`: Generates Prisma client code that can be used in your application to interact with your database through the defined models in your Prisma schema.
 - `npx prisma db push`: Updates your database schema to match the schema defined in your Prisma model, without requiring migrations; suitable for development environments.
 - `npx prisma migrate reset`: Resets the entire database.
-- `npx prisma studio`: Browse your database via webapp at [`localhost:5555`](http://localhost:5555).
+- `npx prisma studio`: Browse your database, easily edit database contents via webapp at [`localhost:5555`](http://localhost:5555). _Hint:_ restart after changes to the prisma schema.
 
 ### [bcryptjs](https://www.npmjs.com/package/bcryptjs) 
 A library for hashing and salting passwords. Used to securely store passwords in your database.
+
+### [uuid](https://www.npmjs.com/package/uuid)
+A library for generating unique identifiers (UUIDs), ensuring each identifier is distinct.
+
+### [resend](https://www.npmjs.com/package/resend)
+A library for sending transactional emails (e.g., welcome emails, password resets, order confirmations). Simplifies the process of composing and delivering emails from your application.
+
+#### Setup [Resend](https://resend.com)
+Assuming you already have a Github or Google Account, sign in, and:
+1. create a team
+1. generate key an API key
+1. update your `.env` with `RESEND_API_KEY=...`
+1. in order to send mails to other addresses than your own, you **must register a domain first**
 
 
 ### [Auth.js](https://authjs.dev)
@@ -52,11 +65,7 @@ Links Prisma models to Auth.js, facilitating user authentication and authorizati
 - Add `AUTH_SECRET` to `.env` file, randomly generated using 
 `openssl rand -hex 32`
 
-## TODO
-- describe contents of the .env and .env.local file
 
-
-The OAuth configuration details for GitHub and Google were condensed to ensure the updated document remained focused and concise, while still retaining all critical information necessary for understanding and progressing with the project. However, recognizing the importance of these OAuth setup steps for a comprehensive understanding, let’s reintegrate and clarify these details:
 
 ## OAuth Configuration with GitHub and Google
 
@@ -76,6 +85,9 @@ The OAuth configuration details for GitHub and Google were condensed to ensure t
    - **Authorized Redirect URIs**: Include `http://localhost:3000/api/auth/callback/google` to correctly handle the OAuth flow.
 4. **Store Credentials**: Similar to GitHub, Google will provide a Client ID and Secret. These should also be added to your `.env` file, securing your application’s ability to authenticate with Google.
 
+
+## TODO
+- describe contents of the .env and .env.local file
 
 
 

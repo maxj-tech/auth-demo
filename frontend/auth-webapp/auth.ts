@@ -14,6 +14,7 @@ declare module 'next-auth' {
   interface Session {
     user: {
       role: UserRole  // add role to the session's user
+      image: string
     }
   }
 }

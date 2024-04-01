@@ -1,15 +1,16 @@
-import NextAuth from "next-auth"
-import authConfig from "@/auth.config"
-import { PrismaAdapter } from "@auth/prisma-adapter"
-import { db } from "@/lib/db"
-import { getUserById } from "./data/user"
+import NextAuth from 'next-auth'
+import authConfig from '@/auth.config'
+import { PrismaAdapter } from '@auth/prisma-adapter'
+import { db } from '@/lib/db'
+import { getUserById } from '@/data/user'
 import { UserRole } from '@prisma/client'
+import { getTwoFactorConfirmationByUserId } from '@/data/two-factor-confirmation'
 
 
 
 // Module augmentation to solve typescript errors
 // see https://authjs.dev/getting-started/typescript#module-augmentation
-declare module "next-auth" {
+declare module 'next-auth' {
   interface Session {
     user: {
       role: UserRole  // add role to the session's user
@@ -26,7 +27,7 @@ export const {
     // see https://authjs.dev/guides/basics/callbacks
     callbacks: {
       async jwt({ token }) {
-        console.info("jwt callback:", { token })
+        console.info('jwt callback:', { token })
         if (token.sub) {
 
   // due to such db calls in the callbacks using prismas adapter, we had
@@ -40,7 +41,7 @@ export const {
       },
 
       async session({ token, session }) {
-        console.info("session callback:", { session }, { sessionToken: token })
+        console.info('session callback:', { session }, { sessionToken: token })
         
         if (token.sub && session.user) {
           session.user.id = token.sub // added to session.user
@@ -57,17 +58,32 @@ export const {
       // even though we check this in the login action already,
       // we should also check here if a user is allowed to sign in
       async signIn({ user, account }) {
-        console.info("signIn callback:", { user, account })
+        console.info('signIn callback:', { user, account })
 
         // Allow OAuth without email verification
-        if (account?.provider !== "credentials") return true
+        if (account?.provider !== 'credentials') return true
   
-        const existingUser = await getUserById(user.id ?? "")
+        const existingUser = await getUserById(user.id ?? '')
   
         // Prevent sign in without email verification
         if (!existingUser?.emailVerified) return false
   
-        // todo 2fa  
+
+        if (existingUser.isTwoFactorAuthEnabled) {
+          // todo don't bother the user with 2FA on every sign in
+          const twoFactorConfirmation = 
+            await getTwoFactorConfirmationByUserId(existingUser.id)
+  
+          console.debug('twoFactorConfirmation:', twoFactorConfirmation)
+          
+          if (!twoFactorConfirmation) return false
+  
+          // Delete two factor confirmation for next sign in
+          await db.twoFactorConfirmation.delete({
+            where: { id: twoFactorConfirmation.id }
+          })
+        }
+        
         return true
       },
     },
@@ -90,12 +106,12 @@ export const {
       }
     },
     pages: {
-      signIn: "/auth/login",
-      error: "/auth/error",
+      signIn: '/auth/login',
+      error: '/auth/error',
     },
     adapter: PrismaAdapter(db),
     // with Prisma we cannot use the default session adapter as it uses a database
     // to store the session, which does not work on the edge
-    session: { strategy: "jwt" }, 
+    session: { strategy: 'jwt' }, 
     ...authConfig,
 })

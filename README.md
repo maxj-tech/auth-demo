@@ -88,7 +88,11 @@ Links Prisma models to Auth.js, facilitating user authentication and authorizati
 
 ## TODO
 - describe contents of the .env and .env.local file
-
+- refactor 2FA
+   - if password is wrong, that error is shown after 2 fa cycle
+   - code is way too complicated: 
+      - login.ts, 
+      - login-form.tsx
 
 
 

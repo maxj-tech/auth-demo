@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 import * as z from 'zod'
 import { useForm } from 'react-hook-form'
@@ -30,30 +30,45 @@ export const LoginForm = () => {
   // see https://authjs.dev/concepts/faq for more info
   const urlError = searchParams.get('error') === 'OAuthAccountNotLinked'
     ? 'Email already in use (maybe with different provider?).'
-    : '';
+    : ''
   
-  const [error, setError] = useState<string | undefined>("");
-  const [success, setSuccess] = useState<string | undefined>("");
-  const [isPending, startTransition] = useTransition()
+  const [showTwoFactor, setShowTwoFactor] = useState(false)
+  const [error, setError] = useState<string | undefined>('')
+  const [success, setSuccess] = useState<string | undefined>('')
+  // const [isPending, startTransition] = useTransition()
+  const [pending, setPending] = useState(false)
   const form = useForm<z.infer<typeof LoginSchema>>({
     resolver: zodResolver(LoginSchema),
     defaultValues: {
       email: '',
-      password: ''
+      password: '',
+      code: '',
     }
   })
 
   const onSubmit = (values: z.infer<typeof LoginSchema>) => {
     setError('')
     setSuccess('')
+    setPending(true)
 
-    startTransition(() => {
       login(values)
         .then((data) => {
-          if (data?.error) setError(data.error)
-          if (data?.success) setSuccess(data.success)   
-        })
-    })
+          if (data?.error) {
+            form.reset()
+            // form.reset({ ...form.getValues(), code: '' }); // Reset only the code field if necessary
+            setError(data.error)
+          }
+          if (data?.success) {
+            form.reset()
+            setSuccess(data.success)   
+          }
+          if (data?.twoFactor) {
+            setShowTwoFactor(true)
+          }
+        }) .catch(() => setError('Something went wrong'))
+        .finally(() => setPending(false))
+
+    
   }
 
   return (
@@ -69,6 +84,29 @@ export const LoginForm = () => {
         className='space-y-6'
       >
         <div className='space-y-4'>
+
+          { showTwoFactor && (
+            <FormField 
+              control={form.control}
+              name='code'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Two Factor Authentication Code</FormLabel>
+                  <FormControl >
+                    <Input 
+                      {...field}
+                      disabled={pending}
+                      placeholder='123456'
+                    />
+                  </FormControl> 
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )}
+
+          { !showTwoFactor && (
+          <>          
           <FormField 
             control={form.control}
             name='email'
@@ -78,7 +116,7 @@ export const LoginForm = () => {
                 <FormControl >
                   <Input 
                     {...field}
-                    disabled={isPending}
+                    disabled={pending}
                     placeholder='john.doe@example.com'
                     type='email'
                   />
@@ -97,7 +135,7 @@ export const LoginForm = () => {
                 <FormControl >
                   <Input 
                     {...field}
-                    disabled={isPending}
+                    disabled={pending}
                     placeholder='********'
                     type='password'
                   />
@@ -108,25 +146,28 @@ export const LoginForm = () => {
           />
 
           <Button
-            size="sm"
-            variant="link"
+            size='sm'
+            variant='link'
             asChild
-            className="px-0 font-normal"
+            className='px-0 font-normal'
           >
-            <Link href="/auth/reset-password">
+            <Link href='/auth/reset-password'>
               Forgot password?
             </Link>
           </Button>
+          </>
+          )}
         </div>
+      
         <FormError message={error || urlError} />
         <FormSuccess message={success} />
         <Button
-          disabled={isPending}
+          disabled={pending}
           type='submit'
           size='lg'       
           className='w-full' 
         >
-          Login
+          { showTwoFactor ? 'Confirm' : 'Login' }
         </Button>
       </form>
      </Form>

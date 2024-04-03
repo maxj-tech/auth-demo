@@ -7,18 +7,6 @@ import { UserRole } from '@prisma/client'
 import { getTwoFactorConfirmationByUserId } from '@/data/two-factor-confirmation'
 
 
-
-// Module augmentation to solve typescript errors
-// see https://authjs.dev/getting-started/typescript#module-augmentation
-declare module 'next-auth' {
-  interface Session {
-    user: {
-      role: UserRole  // add role to the session's user
-      image: string
-    }
-  }
-}
-
 export const {
   handlers: { GET, POST },
   auth,
@@ -29,14 +17,16 @@ export const {
     callbacks: {
       async jwt({ token }) {
         console.info('jwt callback:', { token })
+
         if (token.sub) {
 
   // due to such db calls in the callbacks using prismas adapter, we had
   // to split auth.ts / auth.config.ts as prisma does not work on the edge
           const existingUser = await getUserById(token.sub)
-          if (existingUser)
+          if (existingUser) {
             token.role = existingUser.role
-          token.id = token.sub // added to token
+            token.isTwoFactorAuthEnabled = existingUser.isTwoFactorAuthEnabled
+          }         
         }        
         return token // always return what goes in from the callback
       },
@@ -44,14 +34,19 @@ export const {
       async session({ token, session }) {
         console.info('session callback:', { session }, { sessionToken: token })
         
-        if (token.sub && session.user) {
-          session.user.id = token.sub // added to session.user
-        }
+        if (session.user) {
 
-        if (token.role && session.user) {
-          // fixme we need to add the role to the session type       
-          session.user.role = token.role as UserRole
-        }
+          if (token.sub) {
+            session.user.id = token.sub // added to session.user
+          }
+
+          if (token.role) {
+            // fixme we need to add the role to the session type       
+            session.user.role = token.role as UserRole
+          }
+
+          session.user.isTwoFactorAuthEnabled = token.isTwoFactorAuthEnabled as boolean
+        }        
 
         return session // always return what goes in from the callback
       },
